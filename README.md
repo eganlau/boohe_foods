@@ -29,3 +29,15 @@ Other code enhancements include:
 
 - Use retying library to make http request more robust.
 - Use "code" field as the unique ID rather than ID field. It can lead to a more  complete record downlaods.
+
+Note that being unique with the code field can lead to duplicate with the food name field. You can list those duplicate names by running this Mongodb command:
+
+```
+db.foods_detail_v1.aggregate([
+{$group:{"_id":"$name","name":{$first:"$name"},"count":{$sum:1}}},
+{$match:{"count":{$gt:1}}},
+{$project:{"name":1,"_id":0}},
+{$group:{"_id":null,"duplicateNames":{$push:"$name"}}},
+{$project:{"_id":0,"duplicateNames":1}}
+])
+```
